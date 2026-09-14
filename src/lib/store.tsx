@@ -44,6 +44,31 @@ const StoreContext = createContext<StoreValue | null>(null);
 
 const nextId = (rows: { id: number }[]) => rows.reduce((max, row) => Math.max(max, row.id), 0) + 1;
 
+/** The server requires a starting lane; use the next free slot for the race. */
+const nextStartingPosition = (registrations: Registration[], raceId: number) =>
+  registrations.filter((r) => r.raceId === raceId && r.status !== "REJECTED").length + 1;
+
+/**
+ * Creates a registration. The API requires `participantType`, but its exact
+ * enum wording differs between backend versions, so try the known spellings
+ * and keep the first one the server accepts.
+ */
+async function createRegistrationRequest(
+  payload: Record<string, unknown>,
+  candidates: string[],
+): Promise<unknown> {
+  let lastError: unknown;
+  for (const participantType of candidates) {
+    try {
+      return await api.registrations.create({ ...payload, participantType });
+    } catch (error) {
+      lastError = error;
+      if (!(error instanceof ApiError) || error.status !== 400) throw error;
+    }
+  }
+  throw lastError;
+}
+
 export function StoreProvider({ children }: { children: ReactNode }) {
   const { user } = useAuth();
   const [loading, setLoading] = useState(true);
