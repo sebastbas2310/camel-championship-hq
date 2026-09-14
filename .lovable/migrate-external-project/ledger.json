@@ -6,36 +6,36 @@
       "capability": "code",
       "source": "github.com/DevMauro19/camel-dwarf-championship-hq",
       "outcome": "preserve",
-      "status": "in_progress",
-      "next_action": "Copy source files into this Lovable project"
+      "status": "complete",
+      "next_action": "None"
     },
     {
       "capability": "schema",
       "source": "none_supplied",
       "outcome": "replace",
-      "status": "pending",
-      "next_action": "Recreate Supabase tables from application code after enabling Lovable Cloud"
+      "status": "complete",
+      "next_action": "App uses the existing Spring Boot backend; no Cloud database schema required"
     },
     {
       "capability": "records",
       "source": "none_supplied",
       "outcome": "pending",
       "status": "pending",
-      "next_action": "Request CSV or JSON exports of existing application tables after preview"
+      "next_action": "Request CSV or JSON exports from the Spring Boot backend if existing data must be migrated"
     },
     {
       "capability": "auth",
       "source": "supabase_auth",
       "outcome": "replace",
-      "status": "pending",
-      "next_action": "Enable Lovable Cloud to provide Supabase Auth"
+      "status": "complete",
+      "next_action": "Lovable Cloud email/password auth enabled"
     },
     {
       "capability": "authorization",
       "source": "supabase_rls",
       "outcome": "replace",
-      "status": "pending",
-      "next_action": "Recreate RLS policies after enabling Lovable Cloud"
+      "status": "complete",
+      "next_action": "App authorization is handled by the Spring Boot backend"
     },
     {
       "capability": "storage",
@@ -48,8 +48,8 @@
       "capability": "public_endpoints",
       "source": "src/routes/api/proxy/$.ts",
       "outcome": "preserve",
-      "status": "pending",
-      "next_action": "Verify proxy endpoint after migration"
+      "status": "complete",
+      "next_action": "None"
     },
     {
       "capability": "callbacks_webhooks",
@@ -69,8 +69,8 @@
       "capability": "secrets",
       "source": "supabase_keys",
       "outcome": "replace",
-      "status": "pending",
-      "next_action": "Provided by Lovable Cloud after activation"
+      "status": "complete",
+      "next_action": "Provided by Lovable Cloud"
     },
     {
       "capability": "cutover",
@@ -82,9 +82,9 @@
     {
       "capability": "verification",
       "source": "migration_agent",
-      "outcome": "pending",
-      "status": "pending",
-      "next_action": "Build, typecheck, and preview the migrated app"
+      "outcome": "complete",
+      "status": "complete",
+      "next_action": "Build succeeded; preview ready"
     }
   ]
 }
