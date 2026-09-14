@@ -264,7 +264,8 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         });
       },
       saveRace: (input) => {
-        const saved = persist(() => {
+        const current = input.id ? state.races.find((r) => r.id === input.id) : undefined;
+        const saved = persist(async () => {
           // The backend stores LocalDateTime: no milliseconds, no timezone suffix.
           const local = (iso: string) => iso.replace(/(\.\d+)?(Z|[+-]\d{2}:?\d{2})?$/, "");
           const body = {
@@ -279,7 +280,14 @@ export function StoreProvider({ children }: { children: ReactNode }) {
             registrationDeadline: local(input.registrationDeadline),
             maximumParticipants: input.maxParticipants,
           };
-          return input.id ? api.races.update(input.id, body) : api.races.create(body);
+          if (!input.id) return api.races.create(body);
+          const updated = await api.races.update(input.id, body);
+          // PUT /races/{id} ignores the status field; the lifecycle lives on
+          // PATCH /races/{id}/status, so send it separately when it changed.
+          if (current && current.status !== input.status) {
+            await api.races.setStatus(input.id, input.status);
+          }
+          return updated;
         });
         setState((prev) => {
           if (input.id) {
