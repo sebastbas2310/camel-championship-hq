@@ -1,10 +1,23 @@
-import { supabase as lovableSupabase } from "@/integrations/supabase/client";
+import { createClient } from "@supabase/supabase-js";
 
 /**
- * Lovable Cloud-managed Supabase client.
- * The publishable key is injected by the platform and is safe to ship in the browser.
+ * Auth project trusted by the CamelVSDwarf Spring Boot API
+ * (https://camelvsdwarf.onrender.com/api/v1). The backend validates JWTs issued
+ * by THIS project, so the values are fixed on purpose: using another project's
+ * tokens makes every API call answer 401.
+ * The publishable key is safe to ship in the browser.
  */
-export const supabase = lovableSupabase;
+export const SUPABASE_URL = "https://mrftaeijsdhiulsxqyme.supabase.co";
+export const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_je57m_d8e05dJ2aNtfhsdA_h1ypuMZ-";
+
+export const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
+  auth: {
+    persistSession: typeof window !== "undefined",
+    autoRefreshToken: true,
+    detectSessionInUrl: typeof window !== "undefined",
+    flowType: "pkce",
+  },
+});
 
 /** Returns the current access token, refreshing it when needed. */
 export async function getAccessToken(): Promise<string | null> {
