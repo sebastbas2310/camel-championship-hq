@@ -101,12 +101,19 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   );
 
   const value = useMemo<StoreValue>(() => {
-    /** Best-effort write-through to the racing server; failures surface as a toast. */
+    /** Write-through to the racing server; failures surface as a toast. */
     const persist = (action: () => Promise<unknown>): Promise<boolean> => {
-      if (!live) return Promise.resolve(true);
+      if (!live) {
+        // Without a live server nothing is stored, so never pretend it saved.
+        toast.error(
+          "No hay conexión con el servidor de carreras: el cambio no se guardó. Inicia sesión e inténtalo de nuevo.",
+        );
+        return Promise.resolve(false);
+      }
       return action()
-        .then(() => {
-          void refresh();
+        .then(async () => {
+          // Wait for the reload so the screen shows the server's version.
+          await refresh();
           return true;
         })
         .catch((error) => {
