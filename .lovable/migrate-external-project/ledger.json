@@ -1,0 +1,90 @@
+{
+  "project": "camel-dwarf-championship-hq",
+  "source": "github",
+  "capabilities": [
+    {
+      "capability": "code",
+      "source": "github.com/DevMauro19/camel-dwarf-championship-hq",
+      "outcome": "preserve",
+      "status": "complete",
+      "next_action": "None"
+    },
+    {
+      "capability": "schema",
+      "source": "none_supplied",
+      "outcome": "replace",
+      "status": "complete",
+      "next_action": "App uses the existing Spring Boot backend; no Cloud database schema required"
+    },
+    {
+      "capability": "records",
+      "source": "none_supplied",
+      "outcome": "pending",
+      "status": "pending",
+      "next_action": "Request CSV or JSON exports from the Spring Boot backend if existing data must be migrated"
+    },
+    {
+      "capability": "auth",
+      "source": "supabase_auth",
+      "outcome": "replace",
+      "status": "complete",
+      "next_action": "Lovable Cloud email/password auth enabled"
+    },
+    {
+      "capability": "authorization",
+      "source": "supabase_rls",
+      "outcome": "replace",
+      "status": "complete",
+      "next_action": "App authorization is handled by the Spring Boot backend"
+    },
+    {
+      "capability": "storage",
+      "source": "none_detected",
+      "outcome": "none",
+      "status": "complete",
+      "next_action": "None"
+    },
+    {
+      "capability": "public_endpoints",
+      "source": "src/routes/api/proxy/$.ts",
+      "outcome": "preserve",
+      "status": "complete",
+      "next_action": "None"
+    },
+    {
+      "capability": "callbacks_webhooks",
+      "source": "none_detected",
+      "outcome": "none",
+      "status": "complete",
+      "next_action": "None"
+    },
+    {
+      "capability": "schedules",
+      "source": "none_detected",
+      "outcome": "none",
+      "status": "complete",
+      "next_action": "None"
+    },
+    {
+      "capability": "secrets",
+      "source": "supabase_keys",
+      "outcome": "replace",
+      "status": "complete",
+      "next_action": "Provided by Lovable Cloud"
+    },
+    {
+      "capability": "cutover",
+      "source": "none",
+      "outcome": "none",
+      "status": "complete",
+      "next_action": "None"
+    },
+    {
+      "capability": "verification",
+      "source": "migration_agent",
+      "outcome": "complete",
+      "status": "complete",
+      "next_action": "Build succeeded; preview ready"
+    }
+  ]
+}
