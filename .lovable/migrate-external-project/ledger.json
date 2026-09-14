@@ -1,0 +1,90 @@
+{
+  "project": "camel-dwarf-championship-hq",
+  "source": "github",
+  "capabilities": [
+    {
+      "capability": "code",
+      "source": "github.com/DevMauro19/camel-dwarf-championship-hq",
+      "outcome": "preserve",
+      "status": "in_progress",
+      "next_action": "Copy source files into this Lovable project"
+    },
+    {
+      "capability": "schema",
+      "source": "none_supplied",
+      "outcome": "replace",
+      "status": "pending",
+      "next_action": "Recreate Supabase tables from application code after enabling Lovable Cloud"
+    },
+    {
+      "capability": "records",
+      "source": "none_supplied",
+      "outcome": "pending",
+      "status": "pending",
+      "next_action": "Request CSV or JSON exports of existing application tables after preview"
+    },
+    {
+      "capability": "auth",
+      "source": "supabase_auth",
+      "outcome": "replace",
+      "status": "pending",
+      "next_action": "Enable Lovable Cloud to provide Supabase Auth"
+    },
+    {
+      "capability": "authorization",
+      "source": "supabase_rls",
+      "outcome": "replace",
+      "status": "pending",
+      "next_action": "Recreate RLS policies after enabling Lovable Cloud"
+    },
+    {
+      "capability": "storage",
+      "source": "none_detected",
+      "outcome": "none",
+      "status": "complete",
+      "next_action": "None"
+    },
+    {
+      "capability": "public_endpoints",
+      "source": "src/routes/api/proxy/$.ts",
+      "outcome": "preserve",
+      "status": "pending",
+      "next_action": "Verify proxy endpoint after migration"
+    },
+    {
+      "capability": "callbacks_webhooks",
+      "source": "none_detected",
+      "outcome": "none",
+      "status": "complete",
+      "next_action": "None"
+    },
+    {
+      "capability": "schedules",
+      "source": "none_detected",
+      "outcome": "none",
+      "status": "complete",
+      "next_action": "None"
+    },
+    {
+      "capability": "secrets",
+      "source": "supabase_keys",
+      "outcome": "replace",
+      "status": "pending",
+      "next_action": "Provided by Lovable Cloud after activation"
+    },
+    {
+      "capability": "cutover",
+      "source": "none",
+      "outcome": "none",
+      "status": "complete",
+      "next_action": "None"
+    },
+    {
+      "capability": "verification",
+      "source": "migration_agent",
+      "outcome": "pending",
+      "status": "pending",
+      "next_action": "Build, typecheck, and preview the migrated app"
+    }
+  ]
+}
