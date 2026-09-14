@@ -295,7 +295,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       setRaceStatus: async (id, status) => {
         const previous = state.races.find((r) => r.id === id)?.status;
         const saved = await persist(() => api.races.setStatus(id, status));
-        if (!saved) return;
+        if (!saved) return false;
 
         setState((prev) => ({
           ...prev,
