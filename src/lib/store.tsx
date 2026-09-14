@@ -101,12 +101,19 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   );
 
   const value = useMemo<StoreValue>(() => {
-    /** Best-effort write-through to the racing server; failures surface as a toast. */
+    /** Write-through to the racing server; failures surface as a toast. */
     const persist = (action: () => Promise<unknown>): Promise<boolean> => {
-      if (!live) return Promise.resolve(true);
+      if (!live) {
+        // Without a live server nothing is stored, so never pretend it saved.
+        toast.error(
+          "No hay conexión con el servidor de carreras: el cambio no se guardó. Inicia sesión e inténtalo de nuevo.",
+        );
+        return Promise.resolve(false);
+      }
       return action()
-        .then(() => {
-          void refresh();
+        .then(async () => {
+          // Wait for the reload so the screen shows the server's version.
+          await refresh();
           return true;
         })
         .catch((error) => {
@@ -257,7 +264,8 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         });
       },
       saveRace: (input) => {
-        const saved = persist(() => {
+        const current = input.id ? state.races.find((r) => r.id === input.id) : undefined;
+        const saved = persist(async () => {
           // The backend stores LocalDateTime: no milliseconds, no timezone suffix.
           const local = (iso: string) => iso.replace(/(\.\d+)?(Z|[+-]\d{2}:?\d{2})?$/, "");
           const body = {
@@ -272,7 +280,14 @@ export function StoreProvider({ children }: { children: ReactNode }) {
             registrationDeadline: local(input.registrationDeadline),
             maximumParticipants: input.maxParticipants,
           };
-          return input.id ? api.races.update(input.id, body) : api.races.create(body);
+          if (!input.id) return api.races.create(body);
+          const updated = await api.races.update(input.id, body);
+          // PUT /races/{id} ignores the status field; the lifecycle lives on
+          // PATCH /races/{id}/status, so send it separately when it changed.
+          if (current && current.status !== input.status) {
+            await api.races.setStatus(input.id, input.status);
+          }
+          return updated;
         });
         setState((prev) => {
           if (input.id) {

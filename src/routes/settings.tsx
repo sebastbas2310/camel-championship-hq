@@ -6,7 +6,7 @@ import { Spinner } from "@/components/Spinner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
+
 import { Switch } from "@/components/ui/switch";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -153,15 +153,6 @@ function ProfileCard() {
         <div className="space-y-2">
           <Label htmlFor="email">Correo electrónico</Label>
           <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
-        </div>
-        <div className="space-y-2">
-          <Label>Rol</Label>
-          <div>
-            <Badge variant="outline">{labelize(profile?.role ?? "VIEWER")}</Badge>
-          </div>
-          <p className="text-xs text-muted-foreground">
-            Solo un administrador puede cambiar tu rol.
-          </p>
         </div>
         <Button onClick={save} disabled={saving}>
           {saving ? "Guardando…" : "Guardar cambios"}

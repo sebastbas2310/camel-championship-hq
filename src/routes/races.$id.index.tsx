@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
 import { EmptyState } from "@/components/Spinner";
 import { RaceFormDialog } from "@/components/RaceFormDialog";
+import { AddParticipantsDialog } from "@/components/AddParticipantsDialog";
 import { StatusBadge } from "@/components/StatusBadge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -81,6 +82,7 @@ function RaceDetail() {
       subtitle={`${labelize(race.type)} race · ${approved.length}/${race.maxParticipants} confirmed`}
       actions={
         <div className="flex gap-2">
+          {canAddCompetitor ? <AddParticipantsDialog race={race} /> : null}
           {canManage ? (
             <Button variant="outline" size="sm" onClick={() => setEditOpen(true)}>
               Edit race
