@@ -35,6 +35,7 @@ interface StoreValue extends StoreState {
   saveRace: (input: Omit<Race, "id"> & { id?: number }) => Promise<boolean>;
   setRaceStatus: (id: number, status: Race["status"]) => Promise<boolean>;
   registerCompetitor: (raceId: number, competitorId: number) => Promise<boolean>;
+  registerTeam: (raceId: number, teamId: number) => Promise<boolean>;
   approveRegistration: (id: number) => void;
   rejectRegistration: (id: number, validationNotes: string) => void;
   saveResults: (raceId: number, rows: Omit<RaceResult, "id">[]) => void;
