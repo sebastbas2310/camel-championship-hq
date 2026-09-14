@@ -4,6 +4,7 @@ import { CalendarClock, MapPin, Pencil, Plus, Ruler } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { EmptyState, Spinner } from "@/components/Spinner";
 import { RaceFormDialog } from "@/components/RaceFormDialog";
+import { AddParticipantsDialog } from "@/components/AddParticipantsDialog";
 import { StatusBadge } from "@/components/StatusBadge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -149,6 +150,9 @@ function RacesPage() {
                       </Button>
                       {canManage ? (
                         <>
+                          {race.status !== "COMPLETED" && race.status !== "CANCELLED" ? (
+                            <AddParticipantsDialog race={race} variant="outline" />
+                          ) : null}
                           <Button asChild size="sm" variant="outline">
                             <Link to="/races/$id/registrations" params={{ id: String(race.id) }}>
                               Registrations{pending ? ` (${pending})` : ""}
