@@ -326,7 +326,12 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         return true;
       },
       registerCompetitor: async (raceId, competitorId) => {
-        const saved = await persist(() => api.registrations.create({ raceId, competitorId }));
+        const saved = await persist(() =>
+          createRegistrationRequest(
+            { raceId, competitorId, startingPosition: nextStartingPosition(state.registrations, raceId) },
+            ["INDIVIDUAL", "COMPETITOR", "SINGLE"],
+          ),
+        );
         if (!saved) return false;
 
         setState((prev) => {
@@ -357,6 +362,24 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         toast.success("Competitor registered for race.");
         return true;
       },
+      registerTeam: async (raceId, teamId) => {
+        const saved = await persist(() =>
+          createRegistrationRequest(
+            { raceId, teamId, startingPosition: nextStartingPosition(state.registrations, raceId) },
+            ["TEAM"],
+          ),
+        );
+        if (!saved) return false;
+        log({
+          action: "CREATE_REGISTRATION",
+          entityType: "Registration",
+          description: `Registered team #${teamId} for race #${raceId}`,
+          newValue: "PENDING",
+        });
+        toast.success("Equipo inscrito en la carrera.");
+        return true;
+      },
+
       approveRegistration: (id) => {
         setState((prev) => ({
           ...prev,
