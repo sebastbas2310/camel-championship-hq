@@ -31,23 +31,30 @@ export function AddParticipantsDialog({
   size?: "sm" | "default";
   variant?: "default" | "outline";
 }) {
-  const { competitors, registrations, registerCompetitor } = useStore();
+  const { competitors, teams, registrations, registerCompetitor, registerTeam } = useStore();
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [picked, setPicked] = useState<number[]>([]);
   const [saving, setSaving] = useState(false);
 
+  const isTeamRace = race.type === "TEAM";
   const taken = registrations.filter((r) => r.raceId === race.id && r.status !== "REJECTED");
   const remaining = Math.max(race.maxParticipants - taken.length, 0);
 
   const options = useMemo(() => {
-    const registeredIds = taken.map((r) => r.competitorId);
     const needle = query.trim().toLowerCase();
+    if (isTeamRace) {
+      return teams
+        .filter((t) => !needle || `${t.name} ${t.coach}`.toLowerCase().includes(needle))
+        .map((t) => ({ id: t.id, title: t.name, subtitle: `${t.memberIds.length} integrante(s)` }));
+    }
+    const registeredIds = taken.map((r) => r.competitorId);
     return competitors
       .filter((c) => c.status === "ACTIVE" && !registeredIds.includes(c.id))
-      .filter((c) => !needle || `${c.name} ${c.nickname}`.toLowerCase().includes(needle));
+      .filter((c) => !needle || `${c.name} ${c.nickname}`.toLowerCase().includes(needle))
+      .map((c) => ({ id: c.id, title: c.name, subtitle: labelize(c.type) }));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [competitors, registrations, race.id, query]);
+  }, [competitors, teams, registrations, race.id, query, isTeamRace]);
 
   function toggle(id: number) {
     setPicked((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
@@ -55,7 +62,7 @@ export function AddParticipantsDialog({
 
   async function submit() {
     if (picked.length === 0) {
-      toast.error("Selecciona al menos un competidor.");
+      toast.error(isTeamRace ? "Selecciona al menos un equipo." : "Selecciona al menos un competidor.");
       return;
     }
     if (picked.length > remaining) {
@@ -66,15 +73,19 @@ export function AddParticipantsDialog({
     let added = 0;
     for (const id of picked) {
       // Sequential: the server validates capacity and duplicates per request.
-      if (await registerCompetitor(race.id, id)) added += 1;
+      const ok = isTeamRace ? await registerTeam(race.id, id) : await registerCompetitor(race.id, id);
+      if (ok) added += 1;
     }
     setSaving(false);
     if (added > 0) {
-      toast.success(`${added} participante(s) inscrito(s) en ${race.name}.`);
+      toast.success(
+        `${added} ${isTeamRace ? "equipo(s)" : "participante(s)"} inscrito(s) en ${race.name}.`,
+      );
       setPicked([]);
       setOpen(false);
     }
   }
+
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>

@@ -35,6 +35,7 @@ interface StoreValue extends StoreState {
   saveRace: (input: Omit<Race, "id"> & { id?: number }) => Promise<boolean>;
   setRaceStatus: (id: number, status: Race["status"]) => Promise<boolean>;
   registerCompetitor: (raceId: number, competitorId: number) => Promise<boolean>;
+  registerTeam: (raceId: number, teamId: number) => Promise<boolean>;
   approveRegistration: (id: number) => void;
   rejectRegistration: (id: number, validationNotes: string) => void;
   saveResults: (raceId: number, rows: Omit<RaceResult, "id">[]) => void;
@@ -43,6 +44,31 @@ interface StoreValue extends StoreState {
 const StoreContext = createContext<StoreValue | null>(null);
 
 const nextId = (rows: { id: number }[]) => rows.reduce((max, row) => Math.max(max, row.id), 0) + 1;
+
+/** The server requires a starting lane; use the next free slot for the race. */
+const nextStartingPosition = (registrations: Registration[], raceId: number) =>
+  registrations.filter((r) => r.raceId === raceId && r.status !== "REJECTED").length + 1;
+
+/**
+ * Creates a registration. The API requires `participantType`, but its exact
+ * enum wording differs between backend versions, so try the known spellings
+ * and keep the first one the server accepts.
+ */
+async function createRegistrationRequest(
+  payload: Record<string, unknown>,
+  candidates: string[],
+): Promise<unknown> {
+  let lastError: unknown;
+  for (const participantType of candidates) {
+    try {
+      return await api.registrations.create({ ...payload, participantType });
+    } catch (error) {
+      lastError = error;
+      if (!(error instanceof ApiError) || error.status !== 400) throw error;
+    }
+  }
+  throw lastError;
+}
 
 export function StoreProvider({ children }: { children: ReactNode }) {
   const { user } = useAuth();
@@ -326,7 +352,12 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         return true;
       },
       registerCompetitor: async (raceId, competitorId) => {
-        const saved = await persist(() => api.registrations.create({ raceId, competitorId }));
+        const saved = await persist(() =>
+          createRegistrationRequest(
+            { raceId, competitorId, startingPosition: nextStartingPosition(state.registrations, raceId) },
+            ["INDIVIDUAL", "COMPETITOR", "SINGLE"],
+          ),
+        );
         if (!saved) return false;
 
         setState((prev) => {
@@ -357,6 +388,24 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         toast.success("Competitor registered for race.");
         return true;
       },
+      registerTeam: async (raceId, teamId) => {
+        const saved = await persist(() =>
+          createRegistrationRequest(
+            { raceId, teamId, startingPosition: nextStartingPosition(state.registrations, raceId) },
+            ["TEAM"],
+          ),
+        );
+        if (!saved) return false;
+        log({
+          action: "CREATE_REGISTRATION",
+          entityType: "Registration",
+          description: `Registered team #${teamId} for race #${raceId}`,
+          newValue: "PENDING",
+        });
+        toast.success("Equipo inscrito en la carrera.");
+        return true;
+      },
+
       approveRegistration: (id) => {
         setState((prev) => ({
           ...prev,
